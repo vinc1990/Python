@@ -22,11 +22,12 @@
     }
     #header {
         position: relative;
-        margin-top: 3%;
+        margin-top: 4%;
         margin-bottom: 2%;
     }
     #content {
         width:90%;
+		margin-top: 3%;
         margin-left:15%;
         margin-right:15%;
         margin-bottom: 1%;
@@ -109,8 +110,11 @@
     #content .btn:hover {
         background-color: #f2f2f2;
     }
+	
     </style>
 </head>
+        
+<body>
     <div id="header">
         <img src="../static/title.png" alt="" style="width:50%;margin-left:25%;margin-right:25%;opacity:1;position:relative;" id="title"> 
     </div>
@@ -136,12 +140,12 @@
                         <div class="cell">第二学期</div>
                     </div>
             </div>
-            <button type="submit" class="btn btn-default disabled" id="search">开始查询</button>
+            <button  class="btn btn-default" disabled='' id="search">开始查询</button>
         </form>
     </div>
-    {% block body %} {% endblock %} 
-<body>
-    
+    <div id="form">
+            {% block body %} {% endblock %} 
+    </div>	
 </body>
 <script>
 $(document).ready(function(){
@@ -153,14 +157,15 @@ $(document).ready(function(){
     var xq = '';
 
 
-    $('input[name="stu_id"]').keyup(function(event) {
+    $('input[name="stu_id"]').bind('input propertychange', function(event) {
         stu_id = $(this).val();
 
         if (stu_id != '' && xn != '' && xq != '') {
-            $('#search').removeClass('disabled');
+            
+			$('#search').removeAttr("disabled"); 
         }
         else {
-            $('#search').addClass('disabled');
+            $('#search').attr('disabled',true);
         }
     });
     $('.select').click(function(event) {
@@ -191,12 +196,17 @@ $(document).ready(function(){
         selecting = false;
         
         if (stu_id != '' && xn != '' && xq != '') {
-            $('#search').removeClass('disabled');
+            
+			$('#search').removeAttr("disabled"); 
         }
         else {
-            $('#search').addClass('disabled');
+            $('#search').attr('disabled',true);
         }
     });
+	$('form').submit(function(event){
+		$("img").animate({top:'10px'},'slow');
+	
+	});
 });
 </script>
 </html>

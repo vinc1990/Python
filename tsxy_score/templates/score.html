@@ -1,0 +1,33 @@
+{% extends 'layout.html' %}
+{% block body %} 
+<style>
+	
+</style>
+<div id="score">
+	<table class="table">
+		<thead>
+		  	<tr>
+				<th>序号</th>
+				<th>课程/环节</th>
+				<th>学分</th>
+				<th>类别</th>
+				<th>修读性质</th>
+				<th>考核方式</th>
+				<th>取得方式</th>
+				<th>成绩</th>
+		  	</tr>
+		</thead>
+		<tbody>
+			{% for items in posts[1:] %}
+				<tr>
+					<td>{{loop.index}}</td>
+					{% for item in items %}
+						<td>{{item}}</td>
+					{% endfor %}
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	
+</div>
+{% endblock %}

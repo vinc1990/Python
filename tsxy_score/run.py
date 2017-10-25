@@ -4,16 +4,19 @@ import warnings
 warnings.filterwarnings("ignore")
 import pymysql
 from config import *
-import time
+
 
 app = Flask(__name__)
 app.config.from_object(__name__)
 
 # 连接数据库
 def connectdb():
-	db = pymysql.connect(host=HOST, user=USER, passwd=PASSWORD, db=DATABASE, port=PORT, charset=CHARSET, cursorclass = MySQLdb.cursors.DictCursor)
+	db = pymysql.connect(host=HOST, user=USER, passwd=PASSWORD, db=DATABASE, port=PORT, use_unicode=True, charset=CHARSET)
 	db.autocommit(True)
 	cursor = db.cursor()
+	cursor.execute('SET NAMES utf8;')
+	cursor.execute('SET CHARACTER SET utf8;')
+	cursor.execute('SET character_set_connection=utf8;')
 	return (db,cursor)
 
 # 关闭数据库
@@ -27,62 +30,36 @@ def index():
 	return render_template('index.html')
 
 # 处理表单提交
-@app.route('/handle', methods=['POST'])
+@app.route('/getscore', methods=['POST'])
 def handle():
 	# 获取post数据
 	data = request.form
-
+	if data['xq']=='第一学期':
+		xq = '0'
+	else:
+		xq = '1'
 	# 连接数据库
 	(db,cursor) = connectdb()
 
-	# 添加数据
-	cursor.execute("insert into post(title, content, timestamp) values(%s, %s, %s)", [data['title'], data['content'], str(int(time.time()))])
-	# 最后添加行的id
-	post_id = cursor.lastrowid
+	# 获取学生信息
+	cursor.execute("select * from stu_info where number=%s", data['stu_id'])
+	stu_info = cursor.fetchall()[0]
+	stu_info = stu_info[2:]
+	
+	# 获取学生成绩
+	cursor.execute("select * from stu_score where number=%s and xn=%s and xq=%s", (data['stu_id'], data['xn'], xq))
+	stu_score = cursor.fetchall()
+	posts = []
+	posts.append(stu_info)
+	for L in stu_score:
+		posts.append(L[2:-3])
 
 	# 关闭数据库
 	closedb(db,cursor)
+	print(posts)
+	return render_template('score.html', posts=posts)
 
-	return redirect(url_for('post', post_id=post_id))
 
-# 文章列表页
-@app.route('/list')
-def list():
-	# 连接数据库
-	(db,cursor) = connectdb()
-
-	# 获取数据
-	cursor.execute("select * from post")
-	posts = cursor.fetchall()
-
-	# 格式化时间戳
-	for x in xrange(0, len(posts)):
-		posts[x]['timestamp'] = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(float(posts[x]['timestamp'])))
-
-	# 关闭数据库
-	closedb(db,cursor)
-
-	# 后端向前端传递数据
-	return render_template('list.html', posts=posts)
-
-# 文章详情页
-@app.route('/post/<post_id>')
-def post(post_id):
-	# 连接数据库
-	(db,cursor) = connectdb()
-
-	# 查询数据
-	cursor.execute("select * from post where id=%s", [post_id])
-	post = cursor.fetchone()
-
-	# 格式化时间戳
-	post['timestamp'] = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(float(post['timestamp'])))
-
-	# 关闭数据库
-	closedb(db,cursor)
-
-	# 后端向前端传递数据
-	return render_template('post.html', post=post)
 
 if __name__ == '__main__':
 	app.run(debug=True)
