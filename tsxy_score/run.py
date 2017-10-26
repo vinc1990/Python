@@ -4,7 +4,7 @@ import warnings
 warnings.filterwarnings("ignore")
 import pymysql
 from config import *
-
+import time
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -53,7 +53,11 @@ def handle():
 	posts.append(stu_info)
 	for L in stu_score:
 		posts.append(L[2:-3])
-
+	posts.append(data['xn'])
+	posts.append(str(int(data['xn']) + 1))
+	posts.append(data['xq'])
+	search_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+	posts.append(search_time)
 	# 关闭数据库
 	closedb(db,cursor)
 	print(posts)

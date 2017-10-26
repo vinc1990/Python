@@ -1,10 +1,26 @@
 {% extends 'layout.html' %}
 {% block body %} 
 <style>
+
+p{
 	
+	display: inline;
+	margin-right: 8%;
+}
+#score {
+	margin-top: 1%;
+}
 </style>
+<div id='info'>
+	<p>院(系)/部：{{posts[0][1]}}</p>
+	<p>行政班级：{{posts[0][2]}}</p>
+	<p>学号：{{posts[0][0]}}</p>
+	<p>姓名：{{posts[0][3]}}</p>	
+	<p>查询时间：{{posts[-1]}}</p>	
+</div>
 <div id="score">
-	<table class="table">
+	<p>学年学期：{{posts[-4]}}-{{posts[-3]}}学年{{posts[-2]}}</p>
+	<table class="table table-hover">
 		<thead>
 		  	<tr>
 				<th>序号</th>
@@ -18,7 +34,7 @@
 		  	</tr>
 		</thead>
 		<tbody>
-			{% for items in posts[1:] %}
+			{% for items in posts[1:-4] %}
 				<tr>
 					<td>{{loop.index}}</td>
 					{% for item in items %}
